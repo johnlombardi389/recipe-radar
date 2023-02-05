@@ -1,6 +1,3 @@
-// Components
-import TestSearch from "./components/TestSearch";
-
 function App() {
   return (
     <div className="App">

@@ -1,16 +1,34 @@
 import { useState } from "react";
-// Components
-import SearchResults from "./SearchResults";
+import axios from "axios";
 
 const TestSearch = () => {
-  const edamamApiKey = process.env.REACT_APP_EDAMAM_API_KEY;
+  const apiKey = process.env.REACT_APP_EDAMAM_API_KEY;
+  const apiId = process.env.REACT_APP_EDAMAM_ID;
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState([]);
+  const [startIndex, setStartIndex] = useState(0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Perform the search using the user input
-    console.log(`Searching for: ${searchTerm}`);
+    // Make the API request
+    axios
+      .get(
+        `https://api.edamam.com/search?q=${searchTerm}&app_id=${apiId}&app_key=${apiKey}&to=100`
+      )
+      .then((response) => {
+        // Handle the API response
+        console.log(response);
+        setResults(response.data.hits);
+      })
+      .catch((error) => {
+        // Handle any errors
+        console.error(error);
+      });
+  };
+
+  const handleNext = () => {
+    setStartIndex(startIndex + 20);
   };
 
   return (
@@ -25,7 +43,16 @@ const TestSearch = () => {
         <button type="submit">Search</button>
       </form>
 
-      <SearchResults />
+      <div>
+        {results.slice(startIndex, startIndex + 20).map((result, index) => (
+          <div key={index}>
+            <img src={result.recipe.image} alt={result.recipe.label} />
+            <p>{result.recipe.label}</p>
+          </div>
+        ))}
+      </div>
+
+      <button onClick={handleNext}>Next</button>
     </div>
   );
 };
